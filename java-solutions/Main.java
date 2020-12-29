@@ -10,7 +10,7 @@ public class Main {
     public static Scanner in;
 
     private static boolean isCharCorrect(char c) {
-        return (c <= '9' && c >= '0');
+        return (c <= '9' && c > '0') || c == '.';
     }
 
     private static boolean checkIsBoardCorrect(int[][] board) {
@@ -88,7 +88,7 @@ public class Main {
                     }
 
                     for (int j = 0; j < 9; j++) {
-                        board[i][j] = cur.charAt(j) - '0';
+                        board[i][j] = (cur.charAt(j) != '.') ? cur.charAt(j) - '0' : 0;
                     }
                     break;
                 }
@@ -100,20 +100,24 @@ public class Main {
     private static void printBoard(int[][] board) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                System.out.print(board[i][j] + "");
+                if (j % 3 == 0) System.out.print("|");
+                System.out.print((board[i][j] != 0 ? board[i][j] : ".") + "");
             }
             System.out.println();
+            if ((i+1) % 3 == 0)
+                System.out.println("____________");
         }
     }
 
     public static void main(String[] args) {
         in = new Scanner(System.in);
-        System.out.println("Пожалуйста введите доску Судоку(9 строк), каждая строка должна соответствовать 0, если эта клетка пуста, либо число от 1 до 9 включительно.");
+        System.out.println("Пожалуйста введите доску Судоку(9 строк), \nкаждая строка должна соответствовать '.', если эта клетка пуста,\n либо число от 1 до 9 включительно.\n(между символами не нужно ставить никаких символов)");
         int[][] board = inputBoard();
         if (!checkIsBoardCorrect(board) || !fillBoard(board)) {
             System.out.println("Эту доску нельзя заполнить правильно");
             return;
         }
+        System.out.println("===========\nРезультат:");
         printBoard(board);
     }
 
@@ -121,9 +125,13 @@ public class Main {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (board[i][j] == 0) {
-                    for (int value : possibleValues(i, j)) {
+                    System.out.println("====================");
+                    System.out.println("Подстановка элемента на позицию " + (i + 1) + " " + (j + 1));
+                    for (int value : possibleValues(board, i, j)) {
                         board[i][j] = value;
-                        if (checkIsBoardCorrect(board) && fillBoard(board)) {
+                        System.out.println("Подставляем " + value);
+                        printBoard(board);
+                        if (fillBoard(board)) {
                             return true;
                         }
                         board[i][j] = 0;
@@ -136,37 +144,60 @@ public class Main {
     }
 
     private static List<Integer> possibleValues(int[][] board, int x, int y) {
-        List<Integer> result = new LinkedList<Integer>();
-        if (board[x][y] != 0) {
-             result.add(board[x][y]);
-            return result;
-        }
+        List<Integer> result = new LinkedList<>();
 
         boolean[] check = new boolean[10];
-        for (int i = 0; i<10; i++) {
+        for (int i = 0; i < 9; i++) {
             check[board[x][i]] = true;
             check[board[i][y]] = true;
         }
 
-        
+        int blockX = blocksRow(x);
+        int blockY = blocksColumn(y);
 
-        for (int i = 1; i<10; i++) {
+        for (int i = blockX; i < blockX + 3; i++) {
+            for (int j = blockY; j < blockY + 3; j++) {
+                check[board[i][j]] = true;
+            }
+        }
+
+        for (int i = 1; i < 10; i++) {
             if (!check[i]) {
                 result.add(i);
             }
         }
         return result;
     }
+
+    private static int blocksRow(int x) {
+        if (x >= 0 && x < 3)
+            return 0;
+        if (x >= 3 && x < 6)
+            return 3;
+        if (x >= 6 && x < 9)
+            return 6;
+        return -1;
+    }
+
+    private static int blocksColumn(int y) {
+        if (y >= 0 && y < 3)
+            return 0;
+        if (y >= 3 && y < 6)
+            return 3;
+        if (y >= 6 && y < 9)
+            return 6;
+        return -1;
+    }
 }
 
 /*TEST
-530070000
-600195000
-098000060
-800060003
-400803001
-700020006
-060000280
-000419005
-000080079
+53..7....
+6..195...
+.98....6.
+8...6...3
+4..8.3..1
+7...2...6
+.6....28.
+...419..5
+....8..79
  */
