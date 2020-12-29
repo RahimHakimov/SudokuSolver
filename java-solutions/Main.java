@@ -71,6 +71,7 @@ public class Main {
         int[][] board = inputBoard();
         //ввод логирования(вывод результаты каждого шага или нет)
         System.out.println("Хотите, чтобы выводилось состояние доски на каждом шаге?\n(0 - нет\n1 - да)");
+        // :NOTE: * кидает Exception, если некорректный ввод
         int isLog = in.nextInt();
         while (isLog != 0 && isLog != 1) {
             System.out.println("Хотите, чтобы выводилось состояние доски на каждом шаге?\n(0 - нет\n1 - да)");
@@ -171,7 +172,7 @@ public class Main {
         return result;
     }
 
-    private static boolean checkIsRowsAndColumnsCorrect(int[][] board) {
+    private static boolean  checkIsRowsAndColumnsCorrect(int[][] board) {
         //проверка на корректность по строкам и столбцам
         for (int i = 0; i < 9; i++) {
             boolean[] checkRow = new boolean[10];
@@ -207,7 +208,7 @@ public class Main {
 }
 
 /*
-TEST-1(взят из ВикипедиИ):
+TEST-1(взят из Википеди):
 53..7....
 6..195...
 .98....6.
