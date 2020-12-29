@@ -11,20 +11,24 @@ public class Main {
     public static boolean log;
 
     private static boolean isCharCorrect(char c) {
+        //проверка на корректность ввода
         return (c <= '9' && c > '0') || c == '.';
     }
 
     private static int[][] inputBoard() {
+        //ввод данных
         int[][] board = new int[9][9];
         for (int i = 0; i < 9; i++) {
             String cur = in.nextLine();
             while (true) {
                 if (cur.length() != 9) {
+                    //если ввели больше(или наоборот меньше) 9 символов на одной строке
                     System.out.println("Пожалуйста, проверьте входные данные, и попробуйте ввести это строку заново!");
                     cur = in.nextLine();
                 } else {
                     for (int j = 0; j < 9; j++) {
                         if (!isCharCorrect(cur.charAt(j))) {
+                            //если символ не является корректным
                             System.out.println("Пожалуйста, проверьте входные данные, и попробуйте ввести это строку заново!");
                             cur = in.nextLine();
                             break;
@@ -32,6 +36,7 @@ public class Main {
                     }
 
                     for (int j = 0; j < 9; j++) {
+                        //если всё хорошо, присваиваем значение
                         board[i][j] = (cur.charAt(j) != '.') ? cur.charAt(j) - '0' : 0;
                     }
                     break;
@@ -42,21 +47,29 @@ public class Main {
     }
 
     private static void printBoard(int[][] board) {
+        //вывод доски
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (j % 3 == 0) System.out.print("|");
+                if (j % 3 == 0) {
+                    //разделяем блоки
+                    System.out.print("|");
+                }
                 System.out.print((board[i][j] != 0 ? board[i][j] : ".") + "");
             }
             System.out.println();
-            if ((i + 1) % 3 == 0)
+            if ((i + 1) % 3 == 0) {
+                //разделяем блоки
                 System.out.println("____________");
+            }
         }
     }
 
     public static void main(String[] args) {
         in = new Scanner(System.in);
         System.out.println("Пожалуйста введите доску Судоку(9 строк), \nкаждая строка должна состоять из 9 символов, \nкаждый из которых должен соответствовать '.', если эта клетка пуста,\nлибо число от 1 до 9 включительно.\n(между символами не нужно ставить никаких символов)");
+        //ввод доски
         int[][] board = inputBoard();
+        //ввод логирования(вывод результаты каждого шага или нет)
         System.out.println("Хотите, чтобы выводилось состояние доски на каждом шаге?\n(0 - нет\n1 - да)");
         int isLog = in.nextInt();
         while (isLog != 0 && isLog != 1) {
@@ -64,15 +77,18 @@ public class Main {
             isLog = in.nextInt();
         }
         if (isLog == 1) log = true;
+        //проверка можно ли заполнить доску
         if (!checkIsBoardCorrect(board) || !fillBoard(board)) {
             System.out.println("Эту доску нельзя заполнить правильно!");
             return;
         }
+        //вывод результата
         System.out.println("===============================\nРезультат:");
         printBoard(board);
     }
 
     private static boolean fillBoard(int[][] board) {
+        //находим элемент с минимальным количеством возможностей
         List<Integer> listOfPossible = new LinkedList<>();
         int minLength = 11;
         int indexI = 0, indexJ = 0;
@@ -96,6 +112,7 @@ public class Main {
                 System.out.println("Клетка с минимальным числом оставшихся возможностей имеет индексы " + (indexI + 1) + " " + (indexJ + 1));
                 System.out.println("Всего " + minLength + " возможностей заполнить эту клетку.");
             }
+            //перебираем всевозможные значения на эту клетку
             for (int value : listOfPossible) {
                 board[indexI][indexJ] = value;
                 if (log) {
@@ -113,6 +130,7 @@ public class Main {
     }
 
     private static List<Integer> possibleValues(int[][] board, int x, int y) {
+        //находим значения, которые можно поставить на эту позицию
         List<Integer> result = new LinkedList<>();
 
         boolean[] check = new boolean[10];
@@ -138,10 +156,12 @@ public class Main {
     }
 
     private static int blocksRowOrColumn(int i) {
+        //определения строки(столбца) блока, в котором находится данный элемент
         return (i / 3) * 3;
     }
 
     private static boolean checkIsBoardCorrect(int[][] board) {
+        //проверка доски на корректность
         boolean result = checkIsRowsAndColumnsCorrect(board);
         for (int i = 0; i < 9; i += 3) {
             for (int j = 0; j < 9; j += 3) {
@@ -152,6 +172,7 @@ public class Main {
     }
 
     private static boolean checkIsRowsAndColumnsCorrect(int[][] board) {
+        //проверка на корректность по строкам и столбцам
         for (int i = 0; i < 9; i++) {
             boolean[] checkRow = new boolean[10];
             boolean[] checkColumn = new boolean[10];
@@ -169,6 +190,7 @@ public class Main {
     }
 
     private static boolean checkIsBlockCorrect(int[][] board, int x, int y) {
+        //проверка на корректность по блокам
         boolean[] check = new boolean[10];
         for (int i = x; i < x + 3; i++) {
             for (int j = y; j < y + 3; j++) {
